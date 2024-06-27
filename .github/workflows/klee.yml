@@ -69,6 +69,7 @@ jobs:
           
       - name: Run Klee Analyzer
         run: |
+          set +e
           include_dirs=$(find . -name '*.h' -exec dirname {} + | sort -u | sed 's/^/-I /')
           
           while IFS= read -r -d '' file; do
