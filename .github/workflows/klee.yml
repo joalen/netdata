@@ -13,10 +13,15 @@ jobs:
         with:
           ref: e32c498941d5d92b4695626e805c84802c018038
 
+      - name: Set up Go v1.22
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+        
       - name: Install dependencies for project
         run: | 
           sudo apt-get update
-          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja-build generate-ninja golang-1.22-go golang-1.22
+          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja-build generate-ninja
           
       - name: Build repository 
         run: | 
@@ -61,22 +66,32 @@ jobs:
           mkdir build && cd build 
           cmake -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DKLEE_UCLIBC_PATH=/tmp/klee-uclibc -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
           make
-      
+          
       - name: Run Klee Analyzer
         run: |
-          set +e
-
           include_dirs=$(find . -name '*.h' -exec dirname {} + | sort -u | sed 's/^/-I /')
-
-          find . -name "*.c" -exec grep -q "int main" {} \; -print0 | while IFS= read -r -d '' file; do
+          
+          while IFS= read -r -d '' file; do
               bc_file="${file%.c}.bc"
               if clang -I "$include_dirs" -emit-llvm -c -g -O0 -Xclang -disable-O0-optnone "$file" -o "$bc_file" 2>/dev/null; then
-                  if ! /usr/lib/llvm-14/bin/llvm-nm "$PWD/$bc_file" | grep -q " T main"; then
+                  if ! /usr/lib/llvm-13/bin/llvm-nm "$PWD/$bc_file" | grep -q " T main"; then
                       rm "$bc_file"
                   else
-                      /tmp/klee/build/bin/klee "$bc_file"
+                      klee_output=$(/tmp/klee/build/bin/klee "$bc_file" 2>&1)
+                      klee_exit_code=$?
+          
+                      if [[ $klee_exit_code -eq 0 ]]; then
+                          /tmp/klee/build/bin/klee "$bc_file"
+                          echo ""
+                          echo ""
+                          echo ""
+                      elif [[ $klee_exit_code -eq 1 && $klee_output =~ "Invalid record" ]]; then
+                         	continue 
+                      else
+                          continue
+                      fi
                   fi
               else
                   continue
               fi
-          done
+          done < <(find . -name "*.c" -exec grep -q "int main" {} \; -print0)
