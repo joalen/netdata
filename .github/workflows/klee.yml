@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies for project
         run: | 
           sudo apt-get update
-          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja
+          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja-build
           
       - name: Build repository 
         run: | 
