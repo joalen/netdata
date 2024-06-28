@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v2 
         with:
           ref: e32c498941d5d92b4695626e805c84802c018038
+          submodules: recursive
   
       - name: Set up Go v1.22
         uses: actions/setup-go@v2
