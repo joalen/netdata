@@ -32,10 +32,16 @@ jobs:
       - name: Install dependencies for project (macOS)
         if: runner.os == 'macOS'
         run: |
+          brew update && brew install cmake
+          
+          curl -O https://github.com/macports/macports-base/releases/download/v2.9.3/MacPorts-2.9.3.tar.gz 
+          tar xzvf MacPorts-2.9.3.tar.gz && cd MacPorts-2.9.3
+          ./configure && make && sudo make install 
+          cd ../ && rm -rf MacPorts-2.9.3*
+          
           sudo port selfupdate
           sudo port install libuuid libuv cups mongo-c-driver snappy libyaml ninja cmake protobuf ipmitool libmnl  systemd brotli lz4
-          brew update
-          brew install libmnl netfilter systemd
+          brew update && brew install libmnl netfilter systemd
           
       - name: Build repository 
         run: | 
