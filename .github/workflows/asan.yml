@@ -46,7 +46,6 @@ jobs:
           
           sudo port selfupdate
           sudo port install libuuid libuv libgnomecups mongo-c-driver snappy libyaml ninja cmake protobuf-c ipmitool brotli lz4 h2o
-          brew update && brew install libmnl libnftnl systemd
           
       - name: Build repository 
         run: | 
