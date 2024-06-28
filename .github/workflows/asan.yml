@@ -26,7 +26,7 @@ jobs:
         if: runner.os == 'Linux'
         run: | 
           sudo apt-get update
-          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups-* libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxencall1 ninja-build generate-ninja libelf-dev libelf1 libprotobuf-dev libprotobuf23 gogoprotobuf libipmimonitoring-dev libipmimonitoring6 libmnl-dev libnetfilter-acct-dev systemd libsystemd0 libsystemd-dev libh2o-dev libbrotli-dev  liblz4-1 liblz4-dev liblz4-tool
+          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups-* libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxencall1 ninja-build generate-ninja libelf-dev libelf1 libprotobuf-dev libprotobuf23 gogoprotobuf libipmimonitoring-dev libipmimonitoring6 libmnl-dev libnetfilter-acct-dev systemd libsystemd0 libsystemd-dev libh2o-dev libbrotli-dev  liblz4-1 liblz4-dev liblz4-tool h2o
           export PKG_CONFIG_PATH="/usr/lib/pkgconfig"
           
       - name: Install dependencies for project (macOS)
@@ -44,7 +44,7 @@ jobs:
           sudo port -v selfupdate
           
           sudo port selfupdate
-          sudo port install libuuid libuv cups mongo-c-driver snappy libyaml ninja cmake protobuf ipmitool libmnl  systemd brotli lz4
+          sudo port install libuuid libuv cups mongo-c-driver snappy libyaml ninja cmake protobuf ipmitool libmnl  systemd brotli lz4 h2o
           brew update && brew install libmnl netfilter systemd
           
       - name: Build repository 
