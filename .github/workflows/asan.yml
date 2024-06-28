@@ -32,10 +32,10 @@ jobs:
       - name: Install dependencies for project (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew update && brew install cmake
+          brew update && brew install cmake wget
           
-          curl -O https://github.com/macports/macports-base/releases/download/v2.9.3/MacPorts-2.9.3.tar.gz 
-          tar xzvf MacPorts-2.9.3.tar.gz
+          wget https://github.com/macports/macports-base/releases/download/v2.9.3/MacPorts-2.9.3.tar.gz
+          tar -xvzf MacPorts-2.9.3.tar.gz
           cd MacPorts-2.9.3
           ./configure && make && sudo make install 
           cd ../ && rm -rf MacPorts-2.9.3*
