@@ -52,16 +52,16 @@ jobs:
           sudo pip3 install lit wllvm
           sudo apt-get install -y clang-13 llvm-13 llvm-13-dev llvm-13-tools 
 
+      - uses: actions/checkout@v3
+      - name: 'Run testsuite'
+        if: runner.os == 'macOS'
+        run: development/testsuite
+        
       - name: Install Klee and STP dependencies (macOS)
         if: runner.os == 'macOS'
         run: | 
-           brew install curl git cmake python unzip gperftools sqlite3 graphviz doxygen bash llvm python3-tabulate
-           sudo pip3 install lit wllvm
-           wget https://github.com/macports/macports-base/releases/download/v2.9.3/MacPorts-2.9.3.tar.gz && tar -xvzf MacPorts-2.9.3.tar.gz
-           cd MacPorts-2.9.3
-           ./configure && make && sudo make install
-           cd ../
-           rm -rf MacPorts-2.9.3*
+           brew install curl git cmake python unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate
+           sudo pip3 install lit wllvm           
            sudo port -v selfupdate
            sudo port install clang-13
            sudo port install llvm-13
@@ -69,7 +69,7 @@ jobs:
       - name: Install STP (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get install cmake bison flex libboost-all-dev python perl zlib1g-dev minisat
+          sudo apt-get install cmake bison flex libboost-all-dev perl zlib1g-dev minisat
           git clone https://github.com/stp/stp.git /tmp/stp
           cd /tmp/stp && git checkout tags/2.3.3
           mkdir build && cd build
