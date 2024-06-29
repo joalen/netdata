@@ -22,12 +22,14 @@ jobs:
           go-version: 1.22
         
       - name: Install dependencies for project (a lot of dependencies!!) --> Linux
+        if: runner.os == 'Linux' 
         run: | 
           git submodule update --init --recursive
           sudo apt-get update
           sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups-* libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja-build generate-ninja libelf-dev libelf1 libprotobuf-dev libprotobuf23 gogoprotobuf libipmimonitoring-dev libipmimonitoring6 libmnl-dev libnetfilter-acct-dev systemd libsystemd0 libsystemd-dev libh2o-dev libbrotli-dev  liblz4-1 liblz4-dev liblz4-tool
 
       - name: Install dependencies for project --> macOS
+        if: runner.os == 'macOS' 
         run: | 
           git submodule update --init --recursive
           brew install abseil json-c libuv libyaml lz4 openssl@3 pcre2 protobuf protobuf-c autoconf automake m4 pkg-config ossp-uuid libtool
@@ -37,15 +39,43 @@ jobs:
           cd netdata/
           sudo ./netdata-installer.sh --install-prefix .
       
-      - name: Install Klee and STP dependencies
+      - name: Install Klee and STP dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake curl file g++-multilib gcc-multilib git libcap-dev libunwind-dev libgoogle-perftools-dev libncurses5-dev libsqlite3-dev libtcmalloc-minimal4 python3-pip unzip graphviz doxygen bison flex libboost-all-dev perl zlib1g-dev minisat
           sudo pip3 install lit wllvm
           sudo apt-get install -y clang-13 llvm-13 llvm-13-dev llvm-13-tools 
 
-      - name: Install STP (a dependency to Klee)
+      - name: Install Klee and STP dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: | 
+           brew install curl git cmake python unzip gperftools sqlite3 graphviz doxygen bash llvm python3-tabulate
+           sudo pip3 install lit wllvm
+           wget https://github.com/macports/macports-base/releases/download/v2.9.3/MacPorts-2.9.3.tar.gz && tar -xvzf MacPorts-2.9.3.tar.gz
+           cd MacPorts-2.9.3
+           ./configure && make && sudo make install
+           cd ../
+           rm -rf MacPorts-2.9.3*
+           sudo port -v selfupdate
+           sudo port install clang-13
+           sudo port install llvm-13
+
+      - name: Install STP (Linux)
+        if: runner.os == 'Linux'
         run: |
+          sudo apt-get install cmake bison flex libboost-all-dev python perl zlib1g-dev minisat
+          git clone https://github.com/stp/stp.git /tmp/stp
+          cd /tmp/stp && git checkout tags/2.3.3
+          mkdir build && cd build
+          cmake .. && make 
+          sudo make install
+          ulimit -s unlimited
+      
+      - name: Install STP (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake bison flex python perl minisat
           git clone https://github.com/stp/stp.git /tmp/stp
           cd /tmp/stp && git checkout tags/2.3.3
           mkdir build && cd build
