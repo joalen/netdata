@@ -34,10 +34,8 @@ jobs:
           git submodule update --init --recursive
           brew install abseil json-c libuv libyaml lz4 openssl@3 pcre2 protobuf protobuf-c autoconf automake m4 pkg-config ossp-uuid libtool
       
-      - name: Build repository 
-        run: | 
-          cd netdata/
-          sudo ./netdata-installer.sh --install-prefix .
+      - name: Build repository
+        run: sudo ./netdata-installer.sh --install-prefix .
       
       - name: Install Klee and STP dependencies (Linux)
         if: runner.os == 'Linux'
