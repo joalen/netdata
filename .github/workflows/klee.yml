@@ -88,7 +88,7 @@ jobs:
       - name: Build uClibc and the POSIX environment model
         run: |
           git clone https://github.com/klee/klee-uclibc.git /tmp/klee-uclibc
-          cd /tmp/klee-uclibc && ./configure --make-llvm-lib --with-cc clang-13 --with-llvm-config llvm-config-13
+          cd /tmp/klee-uclibc && ./configure --make-llvm-lib --with-cc clang --with-llvm-config llvm-config-13
           make -j2 
           cd ..
       
