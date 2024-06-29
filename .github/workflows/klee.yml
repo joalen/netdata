@@ -52,10 +52,9 @@ jobs:
           sudo pip3 install lit wllvm
           sudo apt-get install -y clang-13 llvm-13 llvm-13-dev llvm-13-tools 
 
-      - uses: actions/checkout@v3
-      - name: 'Run testsuite'
+      - name: Setup MacPorts
         if: runner.os == 'macOS'
-        run: development/testsuite
+        uses: melusina-org/setup-macports@v1.1.4
         
       - name: Install Klee and STP dependencies (macOS)
         if: runner.os == 'macOS'
