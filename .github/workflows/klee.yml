@@ -85,10 +85,11 @@ jobs:
           mkdir -p /tmp/gtest && cd /tmp/gtest
           curl -OL https://github.com/google/googletest/archive/release-1.11.0.zip && unzip release-1.11.0.zip
       
-      - name: Build uClibc and the POSIX environment model
+      - name: Build uClibc and the POSIX environment model (Linux only!)
+        if: runner.os == 'Linux'
         run: |
           git clone https://github.com/klee/klee-uclibc.git /tmp/klee-uclibc
-          cd /tmp/klee-uclibc && ./configure --make-llvm-lib --with-cc clang --with-llvm-config llvm-config-13
+          cd /tmp/klee-uclibc && ./configure --make-llvm-lib --with-cc clang-13 --with-llvm-config llvm-config-13
           make -j2 
           cd ..
       
