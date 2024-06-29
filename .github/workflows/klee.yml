@@ -93,11 +93,6 @@ jobs:
           make -j2 
           cd ..
       
-      - name: Cloning and building libc++ (a dependency to Klee)
-        run: | 
-          git clone https://github.com/klee/klee.git /tmp/klee
-          sudo LLVM_VERSION=13 BASE=/usr/lib ENABLE_OPTIMIZED=1 DISABLE_ASSERTIONS=1 ENABLE_DEBUG=0 REQUIRES_RTTI=1 /tmp/klee/scripts/build/build.sh libcxx
-      
       - name: Configuring and Building Klee
         run: |
           cd /tmp/klee
