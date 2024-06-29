@@ -33,7 +33,10 @@ jobs:
         run: | 
           git submodule update --init --recursive
           brew install abseil json-c libuv libyaml lz4 openssl@3 pcre2 protobuf protobuf-c autoconf automake m4 pkg-config ossp-uuid libtool
-      
+          echo "/usr/local/bin" >> $GITHUB_PATH
+          echo "/opt/homebrew/bin" >> $GITHUB_PATH
+          echo "/opt/local/bin" >> $GITHUB_PATH
+          
       - name: Build repository (Linux)
         if: runner.os == 'Linux'
         run: | 
