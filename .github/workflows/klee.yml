@@ -95,6 +95,7 @@ jobs:
       
       - name: Configuring and Building Klee
         run: |
+          git clone https://github.com/klee/klee.git /tmp/klee
           cd /tmp/klee
           mkdir build && cd build 
           cmake -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DKLEE_UCLIBC_PATH=/tmp/klee-uclibc -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
