@@ -56,10 +56,10 @@ jobs:
         if: runner.os == 'macOS'
         uses: melusina-org/setup-macports@v1.1.4
         
-      - name: Install Klee and STP dependencies (macOS)
+      - name: Install Klee dependencies + STP (macOS)
         if: runner.os == 'macOS'
         run: | 
-           brew install curl git cmake python@3.11 unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate
+           brew install curl git cmake python@3.11 unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate stp
            sudo pip3 install lit wllvm           
            sudo port -v selfupdate
            sudo port install clang-13
@@ -75,18 +75,7 @@ jobs:
           cmake .. && make 
           sudo make install
           ulimit -s unlimited
-      
-      - name: Install STP (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install cmake bison flex python perl minisat
-          git clone https://github.com/stp/stp.git /tmp/stp
-          cd /tmp/stp && git checkout tags/2.3.3
-          mkdir build && cd build
-          cmake .. && make 
-          sudo make install
-          ulimit -s unlimited
-      
+            
       - name: Downloading Google Test Sources (a dependency to Klee)
         run: |
           mkdir -p /tmp/gtest && cd /tmp/gtest
