@@ -64,7 +64,8 @@ jobs:
            sudo port -v selfupdate
            sudo port install clang-13
            sudo port install llvm-13
-
+           ulimit -s unlimited 
+           
       - name: Install STP (Linux)
         if: runner.os == 'Linux'
         run: |
