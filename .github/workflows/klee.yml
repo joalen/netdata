@@ -59,7 +59,7 @@ jobs:
       - name: Install Klee and STP dependencies (macOS)
         if: runner.os == 'macOS'
         run: | 
-           brew install curl git cmake python unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate python-setuptools
+           brew install curl git cmake python@3.11 unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate
            sudo pip3 install lit wllvm           
            sudo port -v selfupdate
            sudo port install clang-13
