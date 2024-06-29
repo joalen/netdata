@@ -1,11 +1,14 @@
-name: Klee Runner
-
+name: Run Klee
 on:
   push:
 
 jobs:
   run-klee:
-    runs-on: ubuntu-22.04
+    name: '${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-12]
 
     steps:
       - name: Check out repository
@@ -18,15 +21,21 @@ jobs:
         with:
           go-version: 1.22
         
-      - name: Install dependencies for project (a lot of dependencies!!)
+      - name: Install dependencies for project (a lot of dependencies!!) --> Linux
         run: | 
           git submodule update --init --recursive
           sudo apt-get update
           sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups-* libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja-build generate-ninja libelf-dev libelf1 libprotobuf-dev libprotobuf23 gogoprotobuf libipmimonitoring-dev libipmimonitoring6 libmnl-dev libnetfilter-acct-dev systemd libsystemd0 libsystemd-dev libh2o-dev libbrotli-dev  liblz4-1 liblz4-dev liblz4-tool
-          
+
+      - name: Install dependencies for project --> macOS
+        run: | 
+          git submodule update --init --recursive
+          brew install abseil json-c libuv libyaml lz4 openssl@3 pcre2 protobuf protobuf-c autoconf automake m4 pkg-config ossp-uuid libtool
+      
       - name: Build repository 
         run: | 
-          cmake -S . -B build -G "Ninja" && cmake --build build 
+          cd netdata/
+          sudo ./netdata-installer.sh --install-prefix .
       
       - name: Install Klee and STP dependencies
         run: |
@@ -69,6 +78,7 @@ jobs:
           make
           
       - name: Run Klee Analyzer
+        shell: bash
         run: |
           #!/bin/bash
           set +e
