@@ -109,7 +109,7 @@ jobs:
           cd /tmp/klee
           mkdir build && cd build 
           echo 'export LLVM_DIR="/opt/local/var/llvm-13/cmake"' >> $GITHUB_ENV
-          cmake -DLLVM_DIR=/opt/homebrew/Cellar/llvm@13/ -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
+          cmake -DLLVM_DIR=/opt/homebrew/opt/llvm@13 -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
           make
           
       - name: Run Klee Analyzer
