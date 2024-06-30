@@ -66,7 +66,6 @@ jobs:
            sudo pip3 install lit wllvm --break-system-packages
            sudo port -v selfupdate
            brew install llvm@13
-           ulimit -s 65532
            echo 'export PATH="/usr/local/opt/llvm@13/bin:$PATH"' >> $GITHUB_ENV
            echo 'export LDFLAGS="-L/usr/local/opt/llvm@13/lib"' >> $GITHUB_ENV
            echo 'export CPPFLAGS="-I/usr/local/opt/llvm@13/include"' >> $GITHUB_ENV
