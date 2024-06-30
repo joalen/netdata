@@ -65,7 +65,7 @@ jobs:
            brew install curl git cmake unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate stp
            sudo pip3 install lit wllvm --break-system-packages
            sudo port -v selfupdate
-           sudo port install clang-13
+           sudo port install clang-13 --allow-failing
            brew install llvm@13
            ulimit -s 65532
            echo 'export PATH="/usr/local/opt/llvm@13/bin:$PATH"' >> $GITHUB_ENV
