@@ -64,11 +64,10 @@ jobs:
         run: | 
            brew install curl git cmake unzip gperftools sqlite3 graphviz doxygen bash llvm python-tabulate stp
            sudo pip3 install lit wllvm --break-system-packages
-           sudo port -v selfupdate
            brew install llvm@13
-           echo 'export PATH="/usr/local/opt/llvm@13/bin:$PATH"' >> $GITHUB_ENV
-           echo 'export LDFLAGS="-L/usr/local/opt/llvm@13/lib"' >> $GITHUB_ENV
-           echo 'export CPPFLAGS="-I/usr/local/opt/llvm@13/include"' >> $GITHUB_ENV
+           echo 'export PATH="/opt/homebrew/opt/llvm@13/bin:$PATH"' >> $GITHUB_ENV
+           echo 'export LDFLAGS="-L/opt/homebrew/opt/llvm@13/lib"' >> $GITHUB_ENV
+           echo 'export CPPFLAGS="-I/opt/homebrew/opt/llvm@13/include"' >> $GITHUB_ENV
            
       - name: Install STP (Linux)
         if: runner.os == 'Linux'
@@ -110,7 +109,7 @@ jobs:
           cd /tmp/klee
           mkdir build && cd build 
           echo 'export LLVM_DIR="/opt/local/var/llvm-13/cmake"' >> $GITHUB_ENV
-          cmake -DLLVM_DIR=/usr/local/opt/llvm@13/ -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
+          cmake -DLLVM_DIR=/opt/homebrew/opt/llvm@13/ -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
           make
           
       - name: Run Klee Analyzer
