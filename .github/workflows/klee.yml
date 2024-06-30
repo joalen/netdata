@@ -66,7 +66,7 @@ jobs:
            sudo pip3 install lit wllvm           
            sudo port -v selfupdate
            sudo port install clang-13
-           sudo port install llvm-13
+           brew install llvm@13
            ulimit -s 65532
            
       - name: Install STP (Linux)
@@ -93,12 +93,23 @@ jobs:
           make -j2 
           cd ..
       
-      - name: Configuring and Building Klee
+      - name: Configuring and Building Klee (Linux)
+        if: runner.os == 'Linux'
         run: |
           git clone https://github.com/klee/klee.git /tmp/klee
           cd /tmp/klee
           mkdir build && cd build 
           cmake -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DKLEE_UCLIBC_PATH=/tmp/klee-uclibc -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
+          make
+
+      - name: Configuring and Building Klee (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          git clone https://github.com/klee/klee.git /tmp/klee
+          cd /tmp/klee
+          mkdir build && cd build 
+          echo 'export LLVM_DIR="/opt/local/var/llvm-13/cmake"' >> $GITHUB_ENV
+          cmake -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
           make
           
       - name: Run Klee Analyzer
