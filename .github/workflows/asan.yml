@@ -1,0 +1,81 @@
+name: Run AddressSanitizer
+
+on:
+  push:
+
+jobs:
+  run-asan:
+    name: '${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2 
+        with:
+          ref: e32c498941d5d92b4695626e805c84802c018038
+          submodule: recursive
+
+      - name: Set up Go v1.22
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+        
+      - name: Install dependencies and build project (Linux)
+        if: runner.os == "Linux'
+        run: | 
+          git submodule update --init --recursive
+          sudo apt-get update
+          sudo apt-get install -y libuuid1 libuv1 libuv1-dev libcups2 libcups2-dev cups-* libmongoc-1.0-0 libmongoc-dev libsnappy-dev libsnappy1v5 libyaml-0-2 libyaml-dev libxen-dev libxen-dev libxencall1 ninja-build generate-ninja libelf-dev libelf1 libprotobuf-dev libprotobuf23 gogoprotobuf libipmimonitoring-dev libipmimonitoring6 libmnl-dev libnetfilter-acct-dev systemd libsystemd0 libsystemd-dev libh2o-dev libbrotli-dev  liblz4-1 liblz4-dev liblz4-tool
+          cmake -S . -B build -G "Ninja" && cmake --build build 
+          
+      - name: Install dependencies and build project (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install ossp-uuid autoconf automake pkg-config libuv lz4 json-c openssl libtool cmake
+          ./netdata-installer.sh --install-prefix .
+
+      - name: Install Address Sanitizer dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y clang-14 libclang-14-dev llvm-14 llvm-14-dev llvm-14-tools llvm-14-linker-tools
+
+      - name: Install Address Sanitizer dependencies (macOS) 
+        if: runner.os == 'macOS' 
+        run: |
+          brew update
+          brew install llvm ninja
+      
+      - name: Run Google Address Sanitizer
+        run: |
+          #!/bin/bash
+
+          files=$(find . -type f)
+          failed_compilations=0
+          successful_compilations=0
+          TIMEOUT_DURATION=10
+
+          for file in $files; do
+              if [[ "$file" == *.c || "$file" == *.cpp ]]; then
+                  include_dirs=$(find . -name '*.h' -exec dirname {} + | sort -u | sed 's/^/-I /')
+                  clang -I "$include_dirs" -fsanitize=address -O1 -fno-omit-frame-pointer -fno-common -fsanitize-recover=address -g "$file" -o ./compiled.out > compilation.log 2>&1
+                    if [ $? -eq 0 ]; then
+                        timeout $TIMEOUT_DURATION ./compiled.out
+                        exit_status=$?
+                          if [ $exit_status -ne 0 ]; then
+                              ((successful_compilations += 1))
+                              cat compilation.log
+                              echo "--------------------------------------------------"
+                          else
+                              ((failed_compilations += 1))
+                          fi
+                    else
+                        ((failed_compilations += 1))
+                    fi
+                    rm -f ./compiled.out
+              fi
+          done
+
+          echo "Address Sanitizer Failures: $failed_compilations"
+          echo "Address Sanitizer Successes: $successful_compilations"
