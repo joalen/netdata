@@ -24,7 +24,7 @@ jobs:
           go-version: 1.22
         
       - name: Install dependencies and build project (Linux)
-        if: runner.os == "Linux'
+        if: runner.os == 'Linux'
         run: | 
           git submodule update --init --recursive
           sudo apt-get update
