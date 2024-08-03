@@ -2,7 +2,7 @@ name: Run MemorySanitizer
 
 on:
   push:
-
+  
 jobs:
   run-msan:
     name: '${{ matrix.os }}'
@@ -46,6 +46,20 @@ jobs:
         run: |
           brew update
           brew install llvm ninja coreutils
+          
+      - name: Disable Address Space Randomization
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.randomize_va_space=0
+      
+      - name: Disable swapping 
+        if: runner.os == 'Linux' 
+        run: sudo swapoff -a
+
+      - name: Disable swapping 
+        if: runner.os == 'macOS'
+        run: | 
+          sudo sysctl -w vm.swapusage=0
+          sudo sysctl -w vm.compressor_mode=1
       
       - name: Run Google Memory Sanitizer (source code) (Linux)
         if: runner.os == 'Linux'
@@ -53,6 +67,7 @@ jobs:
           #!/bin/bash
           set +e 
 
+          mkdir -p memorysan_logs
           files=$(find . -type f)
           failed_compilations=0
           successful_compilations=0
@@ -69,7 +84,7 @@ jobs:
                       continue  # Skip to the next file on compilation error
                   fi
 
-                  timeout $TIMEOUT_DURATION ./compiled.out
+                  timeout $TIMEOUT_DURATION ./compiled.out > ./memorysan_logs/$(basename "$executable")_msan_report.txt 2>&1
                   exit_status=$?
 
                   if [ $exit_status -eq 1 ]; then
@@ -89,10 +104,13 @@ jobs:
 
       - name: Run Google Memory Sanitizer (source code) (macOS)
         if: runner.os == 'macOS'
+        env:
+          DYLD_NO_PIE: 1
         run: |
           #!/bin/bash
           set +e 
 
+          mkdir -p memorysan_logs
           files=$(find . -type f)
           failed_compilations=0
           successful_compilations=0
@@ -109,7 +127,7 @@ jobs:
                       continue  # Skip to the next file on compilation error
                   fi
 
-                  gtimeout $TIMEOUT_DURATION ./compiled.out
+                  gtimeout $TIMEOUT_DURATION ./compiled.out > ./memorysan_logs/$(basename "$executable")_msan_report.txt 2>&1
                   exit_status=$?
 
                   if [ $exit_status -eq 1 ]; then
@@ -126,3 +144,9 @@ jobs:
 
           echo "Memory Sanitizer Failures: $failed_compilations"
           echo "Memory Sanitizer Successes: $successful_compilations"
+
+      - name: Upload Msan reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: msan-report-${{ github.event.repository.name}}-on-${{ matrix.os }}-from_branch_${{ github.ref_name }}
+          path: './memorysan_logs/*'
