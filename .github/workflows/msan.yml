@@ -54,12 +54,6 @@ jobs:
       - name: Disable swapping 
         if: runner.os == 'Linux' 
         run: sudo swapoff -a
-
-      - name: Disable swapping 
-        if: runner.os == 'macOS'
-        run: | 
-          sudo sysctl -w vm.swapusage=0
-          sudo sysctl -w vm.compressor_mode=1
       
       - name: Run Google Memory Sanitizer (source code) (Linux)
         if: runner.os == 'Linux'
