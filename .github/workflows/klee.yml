@@ -5,7 +5,11 @@ on:
 
 jobs:
   run-klee:
-    runs-on: ubuntu-22.04
+    name: '${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
 
     steps:
       - name: Check out repository
@@ -54,10 +58,11 @@ jobs:
           cd /tmp/klee-uclibc && ./configure --make-llvm-lib --with-cc clang-13 --with-llvm-config llvm-config-13
           make -j2 
           cd ..
-      
+
       - name: Cloning and building libc++ (a dependency to Klee)
         run: | 
           git clone https://github.com/klee/klee.git /tmp/klee
+          cd /tmp/klee && git checkout 26632f1d883e1343a23fd200d2dde070707b294d
           sudo LLVM_VERSION=13 BASE=/usr/lib ENABLE_OPTIMIZED=1 DISABLE_ASSERTIONS=1 ENABLE_DEBUG=0 REQUIRES_RTTI=1 /tmp/klee/scripts/build/build.sh libcxx
       
       - name: Configuring and Building Klee
@@ -66,7 +71,7 @@ jobs:
           mkdir build && cd build 
           cmake -DENABLE_SOLVER_STP=ON -DENABLE_POSIX_RUNTIME=ON -DKLEE_UCLIBC_PATH=/tmp/klee-uclibc -DENABLE_UNIT_TESTS=ON -DGTEST_SRC_DIR=/tmp/gtest/googletest-release-1.11.0 ..
           make
-
+      
       - name: Run Klee Analyzer
         run: |
           #!/bin/bash
